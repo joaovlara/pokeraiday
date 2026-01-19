@@ -1,4 +1,4 @@
-import { RawPokemon, buildCombatant } from "./pokemonUtils";
+import { RawPokemon, buildCombatant, buildCombatantAsync } from "./pokemonUtils";
 
 const MAX_POKEMON_ID = 898; // ajuste se quiser limitar gerações
 
@@ -30,4 +30,13 @@ export function buildBossCombatant(raw: RawPokemon) {
 
 export function buildCandidateCombatant(raw: RawPokemon, level: number) {
   return buildCombatant(raw, level, 31, false);
+}
+
+// helpers assíncronos para construir Combatant com movimentos enriquecidos
+export async function buildBossCombatantAsync(raw: RawPokemon) {
+  return buildCombatantAsync(raw, 100, 31, true);
+}
+
+export async function buildCandidateCombatantAsync(raw: RawPokemon, level: number) {
+  return buildCombatantAsync(raw, level, 31, false);
 }
