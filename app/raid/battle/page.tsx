@@ -20,6 +20,9 @@ export default function RaidBattlePage() {
   const [selectedAllyIndex, setSelectedAllyIndex] = useState<number | null>(null);
   const [selectedMoveIndex, setSelectedMoveIndex] = useState<number | null>(null);
 
+  // controle de turno
+  const [allyAttacked, setAllyAttacked] = useState<Set<number>>(new Set());
+
   useEffect(() => {
     (async () => {
       const bossRaw = sessionStorage.getItem("raidBoss");
@@ -41,6 +44,7 @@ export default function RaidBattlePage() {
       setRound(0);
       setFinished(false);
       setWinner(null);
+      setAllyAttacked(new Set());
     })();
   }, [router]);
 
@@ -60,6 +64,13 @@ export default function RaidBattlePage() {
   async function playerAttack() {
     if (selectedAllyIndex === null || selectedMoveIndex === null) return;
     if (!boss) return;
+
+    // verificar se o aliado já atacou neste turno
+    if (allyAttacked.has(selectedAllyIndex)) {
+      appendLog("Este aliado já atacou neste turno!");
+      return;
+    }
+
     const attacker = team[selectedAllyIndex];
     if (!attacker || attacker.hp <= 0) {
       appendLog("Escolha um aliado vivo.");
@@ -77,6 +88,11 @@ export default function RaidBattlePage() {
     setBoss({ ...boss });
     appendLog(`${attacker.name} usou ${move.name} e causou ${damage} de dano. (x${typeMultiplier.toFixed(2)}${stab > 1 ? ", STAB" : ""})`);
 
+    // marcar aliado como atacante neste turno
+    const newAllyAttacked = new Set(allyAttacked);
+    newAllyAttacked.add(selectedAllyIndex);
+    setAllyAttacked(newAllyAttacked);
+
     // reset seleção para próximo turno
     setSelectedAllyIndex(null);
     setSelectedMoveIndex(null);
@@ -89,16 +105,22 @@ export default function RaidBattlePage() {
       return;
     }
 
-    // boss responde imediatamente
+    // aguardar um pouco antes do turno do boss
+    await new Promise((res) => setTimeout(res, 500));
+
+    // executar turno do boss (1 ataque, 1 alvo)
     await bossTurn();
   }
 
-  // boss ataca alvo aleatório
+  // boss ataca um alvo aleatório
   async function bossTurn() {
     if (!boss) return;
     const alive = team.filter((t) => t.hp > 0);
     if (alive.length === 0) return;
+
+    // boss escolhe um alvo aleatório
     const target = alive[Math.floor(Math.random() * alive.length)];
+
     const move = boss.moves[0] || { name: "Smash", power: 60, type: "normal" };
     const { damage, typeMultiplier } = calcDamageWithType(boss, target, move);
     target.hp = Math.max(0, target.hp - damage);
@@ -110,9 +132,13 @@ export default function RaidBattlePage() {
       appendLog(`Derrota. Toda a equipe foi derrotada.`);
       setFinished(true);
       setWinner("boss");
-    } else {
-      setRound((r) => r + 1);
+      return;
     }
+
+    // reset turno: limpar ataques dos aliados para próximo turno
+    setAllyAttacked(new Set());
+    setRound((r) => r + 1);
+    appendLog("--- Turno encerrado ---");
   }
 
   function resetRaid() {
@@ -217,10 +243,10 @@ export default function RaidBattlePage() {
           <div className="mt-4 flex gap-3 items-center">
             <button
               onClick={playerAttack}
-              disabled={selectedAllyIndex === null || selectedMoveIndex === null || running || finished}
+              disabled={selectedAllyIndex === null || selectedMoveIndex === null || running || finished || allyAttacked.has(selectedAllyIndex ?? -1)}
               className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
             >
-              Atacar
+              {selectedAllyIndex !== null && allyAttacked.has(selectedAllyIndex) ? "Já atacou neste turno" : "Atacar"}
             </button>
 
             <button onClick={resetRaid} className="px-4 py-2 rounded bg-gray-700 text-slate-100 hover:bg-gray-600">
