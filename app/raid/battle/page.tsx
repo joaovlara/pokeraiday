@@ -1,3 +1,4 @@
+// app/raid/battle/page.tsx
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -61,35 +62,32 @@ export default function RaidBattlePage() {
     participants.sort((a, b) => b.actor.spd - a.actor.spd);
 
     for (const p of participants) {
-      // checar fim
       if (isBossDead(boss) || isTeamDead(team)) break;
 
       if (p.type === "ally") {
         const attacker = p.actor;
         if (attacker.hp <= 0) continue;
-        const power = 50; // simplificado: power fixo para aliados
+        const power = 50;
         const damage = calcDamage(attacker, boss!, power);
         boss!.hp = Math.max(0, boss!.hp - damage);
         appendLog(`${attacker.name} causou ${damage} de dano ao Boss ${boss!.name}.`);
         setBoss({ ...boss! });
       } else {
-        // boss ataca alvo aleatório vivo
         const alive = team.filter((t) => t.hp > 0);
         if (alive.length === 0) break;
         const target = alive[Math.floor(Math.random() * alive.length)];
-        const power = 60; // boss tem power maior por padrão
+        const power = 60;
         const damage = calcDamage(boss!, target, power);
         target.hp = Math.max(0, target.hp - damage);
         appendLog(`Boss ${boss!.name} causou ${damage} de dano a ${target.name}.`);
         setTeam((prev) => prev.map((t) => (t.id === target.id ? { ...target } : t)));
       }
 
-      // pequena pausa para dar sensação de sequência (opcional)
+      // pequena pausa para sequência
       // eslint-disable-next-line no-await-in-loop
       await new Promise((res) => setTimeout(res, 200));
     }
 
-    // checar fim após o round
     if (isBossDead(boss)) {
       appendLog(`Vitória! O boss ${boss!.name} foi derrotado.`);
       setFinished(true);
@@ -111,94 +109,99 @@ export default function RaidBattlePage() {
 
   if (!boss) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-slate-100">
         <div>Carregando batalha...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-8 bg-linear-to-br from-yellow-50 to-red-100">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen p-8 bg-gray-900 text-slate-100">
+      <div className="max-w-5xl mx-auto">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Raid Battle</h1>
-          <div className="text-sm text-gray-600">Round: {round}</div>
+          <div className="text-sm text-gray-400">Round: {round}</div>
         </header>
 
-        <main className="bg-white rounded-2xl shadow p-6">
-          <div className="flex gap-6">
-            <div className="w-1/3 bg-gray-50 p-4 rounded-lg">
-              <h2 className="font-semibold mb-3">Boss</h2>
-              <div className="flex items-center gap-4">
-                <div className="w-24 h-24">
+        <main className="bg-gray-800/60 rounded-2xl shadow-lg p-6 border border-gray-700">
+          {/* Boss centralizado no topo */}
+          <section className="flex flex-col items-center mb-8">
+            <div className="bg-gray-900 border border-gray-700 rounded-3xl p-6 flex flex-col items-center w-full">
+              <div className="w-full flex justify-center">
+                <div className="w-56 h-56 bg-gray-800 rounded-full flex items-center justify-center shadow-inner">
                   {boss.sprite ? (
-                    <Image src={boss.sprite} alt={boss.name} width={96} height={96} />
+                    <Image src={boss.sprite} alt={boss.name} width={500} height={500} />
                   ) : null}
                 </div>
-                <div>
-                  <div className="capitalize font-bold text-lg">{boss.name}</div>
-                  <div className="text-sm text-gray-600">Lv {boss.level}</div>
-                  <div className="mt-2 text-sm">HP: {boss.hp} / {boss.hpMax}</div>
-                  <div className="w-48 h-3 bg-gray-200 rounded mt-2 overflow-hidden">
+              </div>
+
+              <div className="mt-4 text-center">
+                <div className="capitalize text-2xl font-bold text-slate-100">{boss.name}</div>
+                <div className="text-sm text-gray-400 mt-1">Lv {boss.level}</div>
+
+                <div className="mt-3 text-sm text-slate-100">HP: {boss.hp} / {boss.hpMax}</div>
+                <div className="w-80 h-4 bg-gray-700 rounded-full mt-2 overflow-hidden">
+                  <div
+                    className="h-4 bg-red-500 transition-all duration-500"
+                    style={{ width: `${(boss.hp / boss.hpMax) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Equipe abaixo do boss */}
+          <section className="mb-6">
+            <h2 className="text-lg font-semibold mb-4 text-slate-100">Sua Equipe</h2>
+            <div className="flex gap-4 justify-center flex-wrap">
+              {team.map((t) => (
+                <div key={t.id} className="w-40 bg-gray-900 border border-gray-700 p-3 rounded-xl text-center">
+                  <div className="w-28 h-28 mx-auto bg-gray-800 rounded-lg flex items-center justify-center">
+                    {t.sprite ? <Image src={t.sprite} alt={t.name} width={96} height={96} /> : null}
+                  </div>
+                  <div className="capitalize font-medium mt-2 text-slate-100">{t.name}</div>
+                  <div className="text-sm text-gray-400">Lv {t.level}</div>
+                  <div className="text-sm mt-1 text-slate-100">HP: {t.hp}/{t.hpMax}</div>
+                  <div className="w-full h-2 bg-gray-700 rounded mt-2 overflow-hidden">
                     <div
-                      className="h-3 bg-red-500 transition-all"
-                      style={{ width: `${(boss.hp / boss.hpMax) * 100}%` }}
+                      className={`h-2 transition-all duration-500 ${t.hp / t.hpMax > 0.5 ? "bg-green-500" : t.hp / t.hpMax > 0.2 ? "bg-yellow-400" : "bg-red-500"}`}
+                      style={{ width: `${(t.hp / t.hpMax) * 100}%` }}
                     />
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
+          </section>
 
-            <div className="flex-1 bg-gray-50 p-4 rounded-lg">
-              <h2 className="font-semibold mb-3">Equipe</h2>
-              <div className="grid grid-cols-5 gap-3">
-                {team.map((t) => (
-                  <div key={t.id} className="bg-white p-3 rounded-lg text-center border">
-                    <div className="w-20 h-20 mx-auto">
-                      {t.sprite ? <Image src={t.sprite} alt={t.name} width={80} height={80} /> : null}
-                    </div>
-                    <div className="capitalize font-medium mt-2">{t.name}</div>
-                    <div className="text-sm text-gray-600">Lv {t.level}</div>
-                    <div className="text-sm mt-1">HP: {t.hp}/{t.hpMax}</div>
-                    <div className="w-full h-2 bg-gray-200 rounded mt-2 overflow-hidden">
-                      <div
-                        className={`h-2 ${t.hp / t.hpMax > 0.5 ? "bg-green-500" : t.hp / t.hpMax > 0.2 ? "bg-yellow-400" : "bg-red-500"} transition-all`}
-                        style={{ width: `${(t.hp / t.hpMax) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 flex gap-3">
+          {/* Controles e status */}
+          <div className="mt-4 flex gap-3 items-center">
             <button
               onClick={runRound}
               disabled={running || finished || team.every((t) => t.hp <= 0) || boss.hp <= 0}
-              className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+              className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
             >
               {running ? "Executando..." : "Executar Round"}
             </button>
 
-            <button onClick={resetRaid} className="px-4 py-2 rounded bg-gray-200">
+            <button onClick={resetRaid} className="px-4 py-2 rounded bg-gray-700 text-slate-100 hover:bg-gray-600">
               Voltar / Reiniciar
             </button>
 
             {finished && winner === "player" && (
-              <div className="ml-auto text-green-700 font-bold">Vitória! Você derrotou o boss.</div>
+              <div className="ml-auto text-emerald-400 font-bold">Vitória! Você derrotou o boss.</div>
             )}
             {finished && winner === "boss" && (
-              <div className="ml-auto text-red-600 font-bold">Derrota. Sua equipe foi derrotada.</div>
+              <div className="ml-auto text-red-400 font-bold">Derrota. Sua equipe foi derrotada.</div>
             )}
           </div>
 
+          {/* Log */}
           <section className="mt-6">
-            <h3 className="font-semibold mb-2">Log de combate</h3>
-            <div className="h-48 overflow-auto bg-black/5 p-3 rounded">
-              {log.length === 0 && <div className="text-sm text-gray-500">Nenhuma ação ainda.</div>}
+            <h3 className="font-semibold mb-2 text-slate-100">Log de combate</h3>
+            <div className="h-48 overflow-auto bg-gray-900/60 p-3 rounded border border-gray-800">
+              {log.length === 0 && <div className="text-sm text-gray-400">Nenhuma ação ainda.</div>}
               {log.map((l, i) => (
-                <div key={i} className="text-sm mb-1">{l}</div>
+                <div key={i} className="text-sm mb-1 text-slate-100">{l}</div>
               ))}
             </div>
           </section>
