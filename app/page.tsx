@@ -75,10 +75,8 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-slate-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center">Raid — Desafio</h1>
-
+    <div className="min-h-screen bg-gray-900 text-slate-100 p-4">
+      <div className="max-w-2xl mx-auto">
         <BossSection
           boss={boss}
           loadingBoss={loadingBoss}
@@ -86,12 +84,16 @@ export default function HomePage() {
           onDesafiar={handleDesafiar}
         />
 
-        <CandidatesSection
-          candidates={candidates}
-          chosen={chosen}
-          onToggleChoose={toggleChoose}
-          onStartRaid={startRaid}
-        />
+        {candidates.length > 0 && (
+          <>
+            <CandidatesSection
+              candidates={candidates}
+              chosen={chosen}
+              onToggleChoose={toggleChoose}
+              onStartRaid={startRaid}
+            />
+          </>
+        )}
 
         <RaidTip />
       </div>

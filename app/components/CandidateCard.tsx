@@ -16,9 +16,13 @@ export function CandidateCard({
 }: CandidateCardProps) {
   return (
     <div
-      className={`p-3 rounded-lg border ${isChosen ? "ring-2 ring-green-400 border-green-600" : "border-gray-700"} bg-gray-900`}
+      onClick={() => onToggle(candidate)}
+      className={`cursor-pointer p-3 rounded-lg border 
+        ${isChosen ? "ring-2 ring-green-400 border-green-600" : "border-gray-700"} 
+        bg-gray-900 flex flex-col items-center justify-center`}
     >
-      <div className="w-20 h-20 mx-auto">
+      {/* Ícone */}
+      <div className="w-20 h-20 flex items-center justify-center">
         {candidate.raw?.sprites?.front_default ? (
           <Image
             src={candidate.raw.sprites.front_default}
@@ -30,19 +34,10 @@ export function CandidateCard({
           <div className="text-sm text-gray-400">Sem sprite</div>
         )}
       </div>
+
+      {/* Nome */}
       <div className="capitalize font-medium mt-2 text-center text-slate-100">
         {candidate.raw.name}
-      </div>
-      <div className="text-sm text-gray-400 mt-1 text-center">
-        Lv {candidate.level}
-      </div>
-      <div className="mt-3 flex justify-center">
-        <button
-          onClick={() => onToggle(candidate)}
-          className={`px-3 py-1 rounded text-sm ${isChosen ? "bg-red-600 text-white hover:bg-red-700" : "bg-indigo-600 text-white hover:bg-indigo-700"}`}
-        >
-          {isChosen ? "Remover" : "Escolher"}
-        </button>
       </div>
     </div>
   );
