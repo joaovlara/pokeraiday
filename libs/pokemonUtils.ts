@@ -24,6 +24,7 @@ export interface Combatant {
   isBoss?: boolean;
   raw?: RawPokemon;
   types?: string[];
+  hasAttackedThisRound?: boolean;
 }
 
 export function getBaseStat(raw: RawPokemon, statName: string) {

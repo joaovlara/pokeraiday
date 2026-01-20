@@ -35,6 +35,9 @@ export default function RaidBattlePage() {
       const teamCombatPromises = teamArr.map((c) => buildCandidateCombatantAsync(c.raw, c.level));
       const teamCombat = await Promise.all(teamCombatPromises);
 
+      bossCombat.hasAttackedThisRound = false;
+      teamCombat.forEach((t) => (t.hasAttackedThisRound = false));
+
       setBoss(bossCombat);
       setTeam(teamCombat);
       setLog([]);
@@ -65,6 +68,10 @@ export default function RaidBattlePage() {
       appendLog("Escolha um aliado vivo.");
       return;
     }
+    if (attacker.hasAttackedThisRound) {
+      appendLog(`${attacker.name} já atacou nesta rodada. Aguarde a próxima rodada.`);
+      return;
+    }
     const move = attacker.moves[selectedMoveIndex];
     if (!move) {
       appendLog("Movimento inválido.");
@@ -74,6 +81,7 @@ export default function RaidBattlePage() {
     // calcular dano com tipos e STAB
     const { damage, typeMultiplier, stab } = calcDamageWithType(attacker, boss, move);
     boss.hp = Math.max(0, boss.hp - damage);
+    attacker.hasAttackedThisRound = true;
     setBoss({ ...boss });
     appendLog(`${attacker.name} usou ${move.name} e causou ${damage} de dano. (x${typeMultiplier.toFixed(2)}${stab > 1 ? ", STAB" : ""})`);
 
@@ -89,20 +97,26 @@ export default function RaidBattlePage() {
       return;
     }
 
-    // boss responde imediatamente
-    await bossTurn();
+    // verificar se todos os aliados vivos já atacaram
+    const aliveleft = team.filter((t) => t.hp > 0 && !t.hasAttackedThisRound);
+    if (aliveleft.length === 0) {
+      // boss responde
+      await bossTurn();
+    }
   }
 
   // boss ataca alvo aleatório
   async function bossTurn() {
-    if (!boss) return;
+    if (!boss || boss.hasAttackedThisRound) return;
     const alive = team.filter((t) => t.hp > 0);
     if (alive.length === 0) return;
     const target = alive[Math.floor(Math.random() * alive.length)];
     const move = boss.moves[0] || { name: "Smash", power: 60, type: "normal" };
     const { damage, typeMultiplier } = calcDamageWithType(boss, target, move);
     target.hp = Math.max(0, target.hp - damage);
+    boss.hasAttackedThisRound = true;
     setTeam((prev) => prev.map((t) => (t.id === target.id ? { ...target } : t)));
+    setBoss({ ...boss });
     appendLog(`Boss ${boss.name} usou ${move.name} e causou ${damage} a ${target.name}. (x${typeMultiplier.toFixed(2)})`);
 
     // checar derrota
@@ -110,9 +124,16 @@ export default function RaidBattlePage() {
       appendLog(`Derrota. Toda a equipe foi derrotada.`);
       setFinished(true);
       setWinner("boss");
-    } else {
-      setRound((r) => r + 1);
+      return;
     }
+
+    // iniciar próxima rodada - resetar flags de ataque
+    appendLog(`--- Fim da Rodada ${round + 1} ---`);
+    team.forEach((t) => (t.hasAttackedThisRound = false));
+    boss.hasAttackedThisRound = false;
+    setTeam([...team]);
+    setBoss({ ...boss });
+    setRound((r) => r + 1);
   }
 
   function resetRaid() {
@@ -159,9 +180,10 @@ export default function RaidBattlePage() {
             <div className="flex gap-4 justify-center flex-wrap">
               {team.map((t, idx) => {
                 const alive = t.hp > 0;
+                const hasAttacked = t.hasAttackedThisRound;
                 const selected = selectedAllyIndex === idx;
                 return (
-                  <div key={t.id} className={`w-40 bg-gray-900 border ${selected ? "border-emerald-400" : "border-gray-700"} p-3 rounded-xl text-center`}>
+                  <div key={t.id} className={`w-40 bg-gray-900 border ${selected ? "border-emerald-400" : "border-gray-700"} p-3 rounded-xl text-center ${hasAttacked ? "opacity-60" : ""}`}>
                     <div className="w-28 h-28 mx-auto bg-gray-800 rounded-lg flex items-center justify-center">
                       {t.sprite ? <Image src={t.sprite} alt={t.name} width={96} height={96} /> : null}
                     </div>
@@ -174,11 +196,12 @@ export default function RaidBattlePage() {
 
                     <div className="mt-3">
                       <button
-                        onClick={() => setSelectedAllyIndex(alive ? idx : null)}
+                        onClick={() => setSelectedAllyIndex(alive && !hasAttacked ? idx : null)}
                         className={`px-3 py-1 rounded text-sm ${selected ? "bg-emerald-500 text-white" : "bg-indigo-600 text-white"}`}
-                        disabled={!alive || finished}
+                        disabled={!alive || hasAttacked || finished}
+                        title={hasAttacked ? "Já atacou nesta rodada" : ""}
                       >
-                        {selected ? "Selecionado" : alive ? "Selecionar" : "Nocauteado"}
+                        {hasAttacked ? "Atacou" : selected ? "Selecionado" : alive ? "Selecionar" : "Nocauteado"}
                       </button>
                     </div>
                   </div>
