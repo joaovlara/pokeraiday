@@ -105,7 +105,9 @@ export async function buildCombatantAsync(raw: RawPokemon, level: number, iv = 3
   // pega até 4 movimentos e busca detalhes em paralelo
   const moveEntries = (raw.moves || []).slice(0, 8); // pegar mais e filtrar depois
   const moveDetailsPromises = moveEntries.map((m) => fetchMoveDetails(m.move.url));
-  const moveDetails = (await Promise.all(moveDetailsPromises)).filter(Boolean) as any[];
+  const moveDetails = (await Promise.all(moveDetailsPromises)).filter(
+    (m): m is NonNullable<Awaited<ReturnType<typeof fetchMoveDetails>>> => m !== null
+  );
 
   // escolher até 4 moves com power/type (fallbacks se necessário)
   const moves = moveDetails.slice(0, 4).map((m) => ({
@@ -138,7 +140,7 @@ export async function buildCombatantAsync(raw: RawPokemon, level: number, iv = 3
     isBoss,
     raw,
     types,
-  } as any;
+  } as Combatant;
 }
 
 export async function fetchMovePower(moveUrl: string): Promise<number | null> {

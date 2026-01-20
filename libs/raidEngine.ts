@@ -51,11 +51,11 @@ export async function runRound(state: RaidState, onUpdate?: (s: RaidState) => vo
       // escolher movimento: tenta usar primeiro move; busca power se tiver url
       let power = 50;
       const move = attacker.moves[0];
-      if (move && (move as any).url) {
-        const mp = await fetchMovePower((move as any).url);
+      if (move && "url" in move && typeof move.url === "string") {
+        const mp = await fetchMovePower(move.url);
         if (mp) power = mp;
-      } else if ((move as any).power) {
-        power = (move as any).power;
+      } else if (move && "power" in move && typeof move.power === "number") {
+        power = move.power;
       }
       const damage = calcDamage(attacker, state.boss, power);
       state.boss.hp = Math.max(0, state.boss.hp - damage);
@@ -69,11 +69,11 @@ export async function runRound(state: RaidState, onUpdate?: (s: RaidState) => vo
       // boss usa primeiro move se tiver power, senão power default 60
       let power = 60;
       const move = state.boss.moves[0];
-      if (move && (move as any).url) {
-        const mp = await fetchMovePower((move as any).url);
+      if (move && "url" in move && typeof move.url === "string") {
+        const mp = await fetchMovePower(move.url);
         if (mp) power = mp;
-      } else if ((move as any).power) {
-        power = (move as any).power;
+      } else if (move && "power" in move && typeof move.power === "number") {
+        power = move.power;
       }
       const damage = calcDamage(state.boss, target, power);
       target.hp = Math.max(0, target.hp - damage);
