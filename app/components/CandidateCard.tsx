@@ -14,6 +14,11 @@ export function CandidateCard({
   isChosen,
   onToggle,
 }: CandidateCardProps) {
+  // pega o sprite do dream_world, se não existir cai no front_default
+  const sprite =
+    candidate.raw?.sprites?.other?.dream_world?.front_default ||
+    candidate.raw?.sprites?.front_default;
+
   return (
     <div
       onClick={() => onToggle(candidate)}
@@ -23,9 +28,9 @@ export function CandidateCard({
     >
       {/* Ícone */}
       <div className="w-20 h-20 flex items-center justify-center">
-        {candidate.raw?.sprites?.front_default ? (
+        {sprite ? (
           <Image
-            src={candidate.raw.sprites.front_default}
+            src={sprite}
             alt={candidate.raw.name}
             width={80}
             height={80}
@@ -38,6 +43,9 @@ export function CandidateCard({
       {/* Nome */}
       <div className="capitalize font-medium mt-2 text-center text-slate-100">
         {candidate.raw.name}
+      </div>
+      <div className="text-sm text-gray-400 mt-1 text-center">
+        Lv {candidate.level}
       </div>
     </div>
   );
