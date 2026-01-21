@@ -74,3 +74,5 @@ Este repositório implementa um **mini game inspirado em Raids de Pokémon**. O 
   - `app/raid/battle/page.tsx` Loop de rounds, ordem por Speed, aplicação de dano e log.  
   - `lib/pokemonUtils.ts` Funções utilitárias: cálculo de stats, construção de combatantes e cálculo de dano.  
   - `lib/raidGenerator.ts` Funções para buscar Pokémon aleatórios na PokéAPI e montar boss/candidatos.
+
+  Versão de Teste UI: https://pokeraiday-46z14n8si-joao-laras-projects.vercel.app/raid
