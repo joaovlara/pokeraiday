@@ -12,7 +12,7 @@ const TeamBox = () => {
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="flex flex-col items-center justify-center bg-neutral-900 border-stone-700 border-2 rounded-lg p-4"
+            className="flex flex-col items-center justify-center bg-neutral-900 border-stone-700 border-2 aspect-square rounded-lg p-4"
           >
             <Image
               src="/images/sprite.png"
