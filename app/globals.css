@@ -7,10 +7,34 @@
 }
 
 @layer components {
+  .text-base,
+  p {
+    @apply font-normal text-neutral-300;
+  }
+
+  .text-emphasis {
+    @apply text-neutral-200 text-2xl;
+  }
+
+  .boss-name {
+    @apply text-4xl text-white font-black;
+  }
+
   .card {
     @apply bg-white shadow-md rounded-lg p-1;
   }
   .border-card {
     @apply border-stone-700 border-2 rounded-lg p-1;
   }
+  .name-pokemon {
+    @apply text-2xl font-black text-white;
+  }
+
+  .btn-primary {
+    @apply bg-red-900 p-4 w-50 rounded-2xl font-bold text-center hover:bg-red-700;
+  }
+  .btn-secondary {
+    @apply bg-neutral-700 p-4 w-50 rounded-2xl font-bold text-center hover:bg-neutral-600;
+  }
+  
 }

@@ -4,11 +4,11 @@ import Image from "next/image";
 
 const BossBox = () => {
   return (
-    <section className="flex flex-col justify-center items-center gap-5">
-      <h2>DESAFIO DO DIA:</h2>
+    <section className="flex flex-col justify-center items-center gap-5 bg-radial-red">
+      <h2 className="text-emphasis">DESAFIO DO DIA:</h2>
 
-      <div className="flex flex-col items-center justify-center">
-        <h3>PIKACHU</h3>
+      <div className="flex flex-col items-center justify-center gap-1">
+        <h3 className="boss-name">PIKACHU</h3>
         <p>Nivel: 100</p>
         <Image src="/images/sprite.png" alt="sprite" width={200} height={200} />
         <div className="flex">

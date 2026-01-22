@@ -7,7 +7,7 @@ import HomeActions from "./components/HomeActions";
 const page = () => {
   return (
     <main className="flex flex-col justify-center items-center h-screen w-screen gap-10 p-3">
-      <Header />
+      {/* <Header /> */}
       <BossBox />
       <HomeActions />
     </main>
