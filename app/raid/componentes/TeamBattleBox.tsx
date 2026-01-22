@@ -1,7 +1,6 @@
-import React from 'react'
 import PokemonStats from './PokemonStats'
-import AtackBox from './AtackBox'
 import PokemonMenuLateral from './PokemonMenuLateral'
+import LogCombat from './LogCombat'
 
 const TeamBattleBox = () => {
   return (

@@ -1,23 +1,28 @@
-import React from "react";
 import Image from "next/image";
 
 const BossCard = () => {
   return (
-    <section className="flex flex-col gap-5 w-full">
-      <div className="flex flex-col p-5 border-card w-full">
-        <h3>PIKACHU</h3>
-        <p>Nivel: 100</p>
-        <Image src="/images/sprite.png" alt="sprite" width={200} height={200} />
-        <div className="flex">
+    <section className="flex flex-col w-full">
+      <div className="relative flex flex-col p-5 border-card w-[90vw] h-[80vw] bg-neutral-900 overflow-hidden">
+        <h3 className="boss-name relative z-10">PIKACHU</h3>
+        <p className="relative z-10">Nivel: 100</p>
+
+        <Image
+          src="/images/sprite.png"
+          alt="sprite"
+          fill
+          className="object-contain"
+        />
+        <div className="absolute bottom-3 right-3 flex gap-2 z-10">
           <Image
             src="/images/Electric_icon_SwSh.png"
-            alt="sprite"
+            alt="Electric type"
             width={50}
             height={50}
           />
           <Image
             src="/images/Normal_icon_SwSh.png"
-            alt="sprite"
+            alt="Normal type"
             width={50}
             height={50}
           />
