@@ -8,9 +8,16 @@ export interface BossEntity {
   level: number;
   stats: Record<string, number>;
   hp: number;
+  maxHp: number; // adiciona vida máxima
 }
 
 export function toBossEntity(apiData: PokemonAPI): BossEntity {
+  // pega o HP base da API
+  const baseHp = apiData.stats.find((s) => s.stat.name === "hp")?.base_stat ?? 100;
+
+  // multiplicador fixo de 100
+  const maxHp = baseHp * 100;
+
   return {
     id: apiData.id,
     name: apiData.name.toUpperCase(),
@@ -21,11 +28,12 @@ export function toBossEntity(apiData: PokemonAPI): BossEntity {
     level: 100,
     stats: apiData.stats.reduce(
       (acc, s) => {
-        acc[s.stat.name] = 999;
+        acc[s.stat.name] = s.base_stat; // mantém stats originais
         return acc;
       },
       {} as Record<string, number>,
     ),
-    hp: 999,
+    hp: maxHp,     // vida atual começa cheia
+    maxHp: maxHp,  // vida máxima
   };
 }
