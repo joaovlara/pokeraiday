@@ -3,7 +3,7 @@ import Image from "next/image";
 const BossCard = () => {
   return (
     <section className="flex flex-col w-full">
-      <div className="relative flex flex-col p-5 border-card w-[90vw] h-[80vw] bg-neutral-900 overflow-hidden">
+      <div className="relative flex flex-col p-5 border-card w-full aspect-square bg-neutral-900 overflow-hidden">
         <h3 className="boss-name relative z-10">PIKACHU</h3>
         <p className="relative z-10">Nivel: 100</p>
 
