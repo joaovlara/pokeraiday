@@ -1,13 +1,12 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { BossEntity } from "@/entities/boss";
-import { createBoss } from "@/actions/battle";
+import { BossEntity, toBossEntity } from "@/entities/boss";
+import { fetchRandomPokemon } from "@/services/pokeapi";
 
 type BossContextType = {
   boss: BossEntity | null;
-  setBoss: (boss: BossEntity) => void;
-};
+  setBoss: React.Dispatch<React.SetStateAction<BossEntity | null>>;};
 
 const BossContext = createContext<BossContextType | undefined>(undefined);
 
@@ -15,11 +14,12 @@ export const BossProvider = ({ children }: { children: React.ReactNode }) => {
   const [boss, setBoss] = useState<BossEntity | null>(null);
 
   useEffect(() => {
-    const initBoss = async () => {
-      const bossData = await createBoss();
-      setBoss(bossData);
+    const loadBoss = async () => {
+      const apiData = await fetchRandomPokemon();
+      const bossEntity = toBossEntity(apiData);
+      setBoss(bossEntity);
     };
-    initBoss();
+    loadBoss();
   }, []);
 
   return (

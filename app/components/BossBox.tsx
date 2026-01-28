@@ -1,22 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { fetchRandomPokemon } from "@/services/pokeapi";
-import { BossEntity, toBossEntity } from "@/entities/boss";
+import { useBoss } from "@/context/BossProvider";
 import TypeBadge from "./TypeBadge";
 
 const BossBox = () => {
-  const [boss, setBoss] = useState<BossEntity | null>(null);
-
-  useEffect(() => {
-    const loadBoss = async () => {
-      const apiData = await fetchRandomPokemon();
-      const bossEntity = toBossEntity(apiData);
-      setBoss(bossEntity);
-    };
-    loadBoss();
-  }, []);
+  const { boss } = useBoss();
 
   if (!boss) return <p>Carregando Boss...</p>;
 

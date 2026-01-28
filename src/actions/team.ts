@@ -4,10 +4,18 @@ import { randomInt } from "../utils/random";
 
 export async function createAttackers(count = 8): Promise<PokemonEntity[]> {
   const attackers: PokemonEntity[] = [];
-  for (let i = 0; i < count; i++) {
-    const apiData = await fetchPokemon(randomInt(1, 898));
+  const usedIds = new Set<number>();
+
+  while (attackers.length < count) {
+    const id = randomInt(1, 1.025);
+
+    if (usedIds.has(id)) continue;
+
+    const apiData = await fetchPokemon(id);
     const level = randomInt(18, 80);
     attackers.push(toPokemonEntity(apiData, level));
+    usedIds.add(id);
   }
+
   return attackers;
 }
