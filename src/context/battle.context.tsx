@@ -50,54 +50,57 @@ export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({
     setWinner(null);
   };
 
-  // 👉 Aqui você substitui a função nextRound
   const nextRound = () => {
     if (!boss || winner) return;
 
-    const participants = [
-      ...team.filter((p) => p.hp > 0),
-      ...(boss.hp > 0 ? [boss] : []),
-    ];
+    // Filtra combatentes vivos
+    const aliveTeam = team.filter((p) => p.hp > 0);
+    const aliveBoss = boss.hp > 0 ? [boss] : [];
 
-    const turnOrder = participants.sort(
+    // Ordem de ação: todos os vivos, ordenados por Speed
+    const turnOrder = [...aliveTeam].sort(
       (a, b) => (b.stats.speed ?? 0) - (a.stats.speed ?? 0),
     );
 
     const newLogs: ActionLog[] = [];
 
+    // Cada Pokémon ataca uma vez
     turnOrder.forEach((actor) => {
       if (actor.hp <= 0) return;
 
-      if ("moves" in actor) {
-        // Pokémon do jogador
-        const move = actor.moves[0];
-        const damage = calculateDamage(actor, boss!, move);
-        boss!.hp = Math.max(0, boss!.hp - damage);
-        newLogs.push({
-          actor: actor.name,
-          target: boss!.name,
-          move: move.name,
-          damage,
-          remainingHP: boss!.hp,
-        });
-      } else {
-        // Boss
-        const aliveTeam = team.filter((p) => p.hp > 0);
-        if (aliveTeam.length === 0) return;
-        const target = aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
-        const move = boss!.moves[0];
-        const damage = calculateDamage(boss!, target, move);
-        target.hp = Math.max(0, target.hp - damage);
-        newLogs.push({
-          actor: boss!.name,
-          target: target.name,
-          move: move.name,
-          damage,
-          remainingHP: target.hp,
-        });
-      }
+      // Escolhe um dos 4 moves do Pokémon
+      const move = actor.moves[Math.floor(Math.random() * actor.moves.length)];
+      const damage = calculateDamage(actor, boss!, move);
+
+      boss!.hp = Math.max(0, boss!.hp - damage);
+
+      newLogs.push({
+        actor: actor.name,
+        target: boss!.name,
+        move: move.name,
+        damage,
+        remainingHP: boss!.hp,
+      });
     });
 
+    // Boss ataca por último
+    if (boss!.hp > 0) {
+      const target = aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
+      const move = boss!.moves[Math.floor(Math.random() * boss!.moves.length)];
+      const damage = calculateDamage(boss!, target, move);
+
+      target.hp = Math.max(0, target.hp - damage);
+
+      newLogs.push({
+        actor: boss!.name,
+        target: target.name,
+        move: move.name,
+        damage,
+        remainingHP: target.hp,
+      });
+    }
+
+    // Condições de vitória
     if (boss!.hp <= 0) {
       setWinner("player");
     } else if (team.every((p) => p.hp <= 0)) {

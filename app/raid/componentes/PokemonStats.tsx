@@ -4,29 +4,16 @@ import { useState } from "react";
 import { PokemonEntity } from "@/entities/pokemon";
 import { BossEntity } from "@/entities/boss";
 import Image from "next/image";
-
-interface Attack {
-  nome: string;
-  dano: number | string;
-  usos: string;
-  tipo: string;
-}
+import { typeMap } from "@/utils/typeMap"; // para ícone e cor do tipo
 
 interface PokemonStatsProps {
   pokemon: PokemonEntity;
   boss: BossEntity | null;
-  onAttack: (attack: Attack, pokemon: PokemonEntity) => void; // nova prop
+  onAttack: (attack: any, pokemon: PokemonEntity) => void;
 }
 
 const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
   const [selectedAttack, setSelectedAttack] = useState<number | null>(null);
-
-  const attacks: Attack[] = [
-    { nome: "Flame Charge", dano: 60, usos: "15/15", tipo: "/images/Fire_icon_SwSh.png" },
-    { nome: "Brave Bird", dano: 120, usos: "10/10", tipo: "/images/Flying_icon_SwSh.png" },
-    { nome: "Steel Wing", dano: 70, usos: "20/20", tipo: "/images/Steel_icon_SwSh.png" },
-    { nome: "Roost", dano: "-", usos: "10/10", tipo: "/images/Flying_icon_SwSh.png" },
-  ];
 
   return (
     <section className="flex flex-col w-full gap-5">
@@ -37,11 +24,13 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
           <p>Nível: {pokemon.level}</p>
         </div>
         <div className="flex justify-between p-3">
-          <p className="text-sm">HP: {pokemon.hp}/{pokemon.hp}</p>
+          <p className="text-sm">
+            HP: {pokemon.hp}/{pokemon.maxHp}
+          </p>
           <div className="w-32 h-3 bg-gray-700 rounded">
             <div
               className="h-3 bg-green-500 rounded"
-              style={{ width: "100%" }}
+              style={{ width: `${(pokemon.hp / pokemon.maxHp) * 100}%` }}
             />
           </div>
         </div>
@@ -49,7 +38,7 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
 
       {/* Ataques do Pokemon */}
       <div className="grid grid-cols-2 grid-rows-2 gap-4">
-        {attacks.map((atk, i) => (
+        {pokemon.moves.slice(0, 4).map((atk, i) => (
           <div
             key={i}
             onClick={() => {
@@ -60,14 +49,14 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
               ${selectedAttack === i ? "border-2 border-neutral-400" : "border"}`}
           >
             <div>
-              <h3 className="name-pokemon text-sm">{atk.nome}</h3>
-              <p className="text-sm text-gray-300">Dano: {atk.dano}</p>
-              <p className="text-sm text-gray-400">{atk.usos}</p>
+              <h3 className="name-pokemon text-sm">{atk.name}</h3>
+              <p className="text-sm text-gray-300">Power: {atk.power ?? "-"}</p>
+              {/* <p className="text-sm text-gray-400">PP: {atk.pp ?? "-"}</p> */}
             </div>
             <div className="w-10 h-10 flex items-center justify-center">
               <Image
-                src={atk.tipo}
-                alt={`Tipo ${atk.nome}`}
+                src={typeMap[atk.type].icon}
+                alt={`Tipo ${atk.type}`}
                 width={32}
                 height={32}
               />

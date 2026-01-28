@@ -4,13 +4,7 @@ import PokemonStats from "./PokemonStats";
 import PokemonMenuLateral from "./PokemonMenuLateral";
 import { PokemonEntity } from "@/entities/pokemon";
 import { BossEntity } from "@/entities/boss";
-
-interface Attack {
-  nome: string;
-  dano: number | string;
-  usos: string;
-  tipo: string;
-}
+import { calculateDamage } from "@/utils/damage";
 
 interface TeamBattleBoxProps {
   team: PokemonEntity[];
@@ -29,21 +23,24 @@ const TeamBattleBox = ({
   setLog,
   setBoss,
 }: TeamBattleBoxProps) => {
-  const handleAttack = (attack: Attack, pokemon: PokemonEntity) => {
+  const handleAttack = (move: any, pokemon: PokemonEntity) => {
     if (!boss) return;
 
-    const dano = typeof attack.dano === "number" ? attack.dano : 0;
+    // calcula dano real
+    const dano = calculateDamage(pokemon, boss, move);
 
-    // Atualiza HP do boss
+    // atualiza HP do boss
     setBoss((prev) =>
       prev ? { ...prev, hp: Math.max(prev.hp - dano, 0) } : prev,
     );
 
-    // Adiciona mensagem no log
+    // adiciona mensagem no log
     setLog((prev) => [
       ...prev,
-      `${pokemon.name} usou ${attack.nome} causando ${dano} de dano em ${boss.name}!`,
+      `${pokemon.name} usou ${move.name} causando ${dano} de dano em ${boss.name}!`,
     ]);
+
+    // aqui depois podemos chamar nextRound() do contexto para o boss atacar
   };
 
   return (

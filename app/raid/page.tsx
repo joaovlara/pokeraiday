@@ -10,15 +10,12 @@ import { createAttackers } from "@/actions/team";
 import { useBattle } from "@/context/battle.context";
 
 const RaidPage = () => {
-  const { boss, setBoss } = useBattle(); // pega o boss global
+  const { boss, logs } = useBattle(); // pega boss e logs do contexto
   const [bossMaxHp, setBossMaxHp] = useState<number>(0);
   const [attackers, setAttackers] = useState<PokemonEntity[]>([]);
   const [team, setTeam] = useState<PokemonEntity[]>([]);
   const [battleStarted, setBattleStarted] = useState(false);
-  const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(
-    null,
-  );
-  const [log, setLog] = useState<string[]>([]);
+  const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(null);
 
   // Sorteia os atacantes apenas uma vez ao carregar a página
   useEffect(() => {
@@ -31,7 +28,7 @@ const RaidPage = () => {
       }
     };
     init();
-  }, []); // 👈 sem dependências, roda apenas na montagem
+  }, []);
 
   // Quando a batalha começa, define o primeiro pokémon ativo
   useEffect(() => {
@@ -59,12 +56,12 @@ const RaidPage = () => {
           boss={boss}
           activePokemon={activePokemon}
           setActivePokemon={setActivePokemon}
-          setLog={setLog}
-          setBoss={setBoss}
         />
       )}
 
-      {battleStarted && <LogCombat log={log} />}
+      {battleStarted && <LogCombat log={logs.map(
+        l => `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`
+      )} />}
     </main>
   );
 };
