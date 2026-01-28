@@ -7,18 +7,20 @@ import TeamBattleBox from "./componentes/TeamBattleBox";
 import LogCombat from "./componentes/LogCombat";
 import { PokemonEntity } from "@/entities/pokemon";
 import { createAttackers } from "@/actions/team";
-import { useBoss } from "@/context/BossProvider"; // importa o contexto
+import { useBattle } from "@/context/battle.context";
 
 const RaidPage = () => {
-  const { boss, setBoss } = useBoss(); // pega o boss global
+  const { boss, setBoss } = useBattle(); // pega o boss global
   const [bossMaxHp, setBossMaxHp] = useState<number>(0);
   const [attackers, setAttackers] = useState<PokemonEntity[]>([]);
   const [team, setTeam] = useState<PokemonEntity[]>([]);
   const [battleStarted, setBattleStarted] = useState(false);
-  const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(null);
+  const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(
+    null,
+  );
   const [log, setLog] = useState<string[]>([]);
 
-  // Sorteia apenas os atacantes ao carregar (boss já vem do contexto)
+  // Sorteia os atacantes apenas uma vez ao carregar a página
   useEffect(() => {
     const init = async () => {
       const attackersData = await createAttackers();
@@ -29,7 +31,7 @@ const RaidPage = () => {
       }
     };
     init();
-  }, [boss]);
+  }, []); // 👈 sem dependências, roda apenas na montagem
 
   // Quando a batalha começa, define o primeiro pokémon ativo
   useEffect(() => {
@@ -58,7 +60,7 @@ const RaidPage = () => {
           activePokemon={activePokemon}
           setActivePokemon={setActivePokemon}
           setLog={setLog}
-          setBoss={setBoss} 
+          setBoss={setBoss}
         />
       )}
 

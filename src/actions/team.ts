@@ -1,20 +1,19 @@
-import { fetchPokemon } from "../services/pokeapi";
-import { toPokemonEntity, PokemonEntity } from "../entities/pokemon";
-import { randomInt } from "../utils/random";
+import { PokemonAPI } from "@/schemas/pokemon.schema";
+import { toPokemonEntity } from "@/entities/pokemon";
 
-export async function createAttackers(count = 8): Promise<PokemonEntity[]> {
-  const attackers: PokemonEntity[] = [];
-  const usedIds = new Set<number>();
+export async function createAttackers(count: number = 8) {
+  const attackers: any[] = [];
 
-  while (attackers.length < count) {
-    const id = randomInt(1, 1.025);
+  for (let i = 0; i < count; i++) {
+    const randomId = Math.floor(Math.random() * 898) + 1;
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
+    const data: PokemonAPI = await res.json();
 
-    if (usedIds.has(id)) continue;
+    // nível aleatório até 70
+    const randomLevel = Math.floor(Math.random() * 70) + 1;
+    const entity = await toPokemonEntity(data, randomLevel);
 
-    const apiData = await fetchPokemon(id);
-    const level = randomInt(18, 80);
-    attackers.push(toPokemonEntity(apiData, level));
-    usedIds.add(id);
+    attackers.push(entity);
   }
 
   return attackers;

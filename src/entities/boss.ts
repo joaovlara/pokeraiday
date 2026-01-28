@@ -1,4 +1,7 @@
+import { calculateHp, calculateStat } from "@/utils/stats";
 import { PokemonAPI } from "../schemas/pokemon.schema";
+import { Attack } from "./pokemon";
+import { getRandomMoves } from "@/utils/moves";
 
 export interface BossEntity {
   id: number;
@@ -9,13 +12,23 @@ export interface BossEntity {
   stats: Record<string, number>;
   hp: number;
   maxHp: number;
+  moves: Attack[];
 }
 
-export function toBossEntity(apiData: PokemonAPI): BossEntity {
-  const multiplier = 100;
+export async function toBossEntity(apiData: PokemonAPI): Promise<BossEntity> {
+  const level = 100;
 
   const baseHp = apiData.stats.find((s) => s.stat.name === "hp")?.base_stat ?? 100;
-  const maxHp = baseHp * multiplier;
+  const maxHp = calculateHp(baseHp, level);
+
+  const stats = apiData.stats.reduce((acc, s) => {
+    if (s.stat.name === "hp") {
+      acc.hp = calculateHp(s.base_stat, level);
+    } else {
+      acc[s.stat.name] = calculateStat(s.base_stat, level);
+    }
+    return acc;
+  }, {} as Record<string, number>);
 
   return {
     id: apiData.id,
@@ -24,15 +37,10 @@ export function toBossEntity(apiData: PokemonAPI): BossEntity {
       apiData.sprites.other?.["official-artwork"].front_default ??
       apiData.sprites.front_default,
     types: apiData.types.map((t) => t.type.name),
-    level: 100,
-    stats: apiData.stats.reduce(
-      (acc, s) => {
-        acc[s.stat.name] = s.base_stat * multiplier;
-        return acc;
-      },
-      {} as Record<string, number>,
-    ),
+    level,
+    stats,
     hp: maxHp,
-    maxHp: maxHp,
+    maxHp,
+    moves: await getRandomMoves(apiData, 3), // Boss com 3 moves
   };
 }

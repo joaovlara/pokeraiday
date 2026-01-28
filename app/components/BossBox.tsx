@@ -1,16 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useBoss } from "@/context/BossProvider";
 import TypeBadge from "./TypeBadge";
+import { useBattle } from "@/context/battle.context";
 
 const BossBox = () => {
-  const { boss } = useBoss();
+  const { boss } = useBattle(); // pega o boss do contexto
 
   if (!boss) return <p>Carregando Boss...</p>;
 
   return (
-    <section className="flex flex-col justify-center items-center gap-5 bg-radial-red">
+    <section className="flex flex-col justify-center items-center gap-5 bg-radial-red p-5 rounded-lg">
       <h2 className="text-emphasis">DESAFIO DO DIA:</h2>
 
       <div className="flex flex-col items-center justify-center gap-1">
@@ -24,6 +24,9 @@ const BossBox = () => {
             <TypeBadge key={type} type={type} />
           ))}
         </div>
+        <p>
+          HP: {boss.hp}/{boss.maxHp}
+        </p>
       </div>
     </section>
   );
