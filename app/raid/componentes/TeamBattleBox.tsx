@@ -5,14 +5,13 @@ import PokemonMenuLateral from "./PokemonMenuLateral";
 import { PokemonEntity } from "@/entities/pokemon";
 import { BossEntity } from "@/entities/boss";
 import { calculateDamage } from "@/utils/damage";
+import { ActionLog, useBattle } from "@/context/battle.context";
 
 interface TeamBattleBoxProps {
   team: PokemonEntity[];
   boss: BossEntity | null;
   activePokemon: PokemonEntity | null;
   setActivePokemon: (pokemon: PokemonEntity) => void;
-  setLog: React.Dispatch<React.SetStateAction<string[]>>;
-  setBoss: React.Dispatch<React.SetStateAction<BossEntity | null>>;
 }
 
 const TeamBattleBox = ({
@@ -20,9 +19,9 @@ const TeamBattleBox = ({
   boss,
   activePokemon,
   setActivePokemon,
-  setLog,
-  setBoss,
 }: TeamBattleBoxProps) => {
+  const { setBoss, setLogs } = useBattle(); // usa setters do contexto
+
   const handleAttack = (move: any, pokemon: PokemonEntity) => {
     if (!boss) return;
 
@@ -30,17 +29,21 @@ const TeamBattleBox = ({
     const dano = calculateDamage(pokemon, boss, move);
 
     // atualiza HP do boss
-    setBoss((prev) =>
+    setBoss((prev: BossEntity | null) =>
       prev ? { ...prev, hp: Math.max(prev.hp - dano, 0) } : prev,
     );
 
     // adiciona mensagem no log
-    setLog((prev) => [
+    setLogs((prev: ActionLog[]) => [
       ...prev,
-      `${pokemon.name} usou ${move.name} causando ${dano} de dano em ${boss.name}!`,
+      {
+        actor: pokemon.name,
+        target: boss.name,
+        move: move.name,
+        damage: dano,
+        remainingHP: Math.max(boss.hp - dano, 0),
+      },
     ]);
-
-    // aqui depois podemos chamar nextRound() do contexto para o boss atacar
   };
 
   return (
@@ -50,7 +53,7 @@ const TeamBattleBox = ({
         <PokemonStats
           pokemon={activePokemon}
           boss={boss}
-          onAttack={handleAttack} // conecta ataque
+          onAttack={handleAttack}
         />
       )}
 
