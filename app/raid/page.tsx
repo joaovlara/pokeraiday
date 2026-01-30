@@ -6,14 +6,12 @@ import TeamBox from "./componentes/TeamBox";
 import TeamBattleBox from "./componentes/TeamBattleBox";
 import LogCombat from "./componentes/LogCombat";
 import { PokemonEntity } from "@/entities/pokemon.entity";
-import { createAttackers } from "@/actions/team";
 import { useBattle } from "@/context/battle.context";
 
 const RaidPage = () => {
-  const { boss, logs } = useBattle(); // pega boss e logs do contexto
+  const { boss, team, logs, startBattle, nextRound, winner } = useBattle(); 
   const [bossMaxHp, setBossMaxHp] = useState<number>(0);
   const [attackers, setAttackers] = useState<PokemonEntity[]>([]);
-  const [team, setTeam] = useState<PokemonEntity[]>([]);
   const [battleStarted, setBattleStarted] = useState(false);
   const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(null);
 
@@ -28,7 +26,7 @@ const RaidPage = () => {
       }
     };
     init();
-  }, []);
+  }, [boss]);
 
   // Quando a batalha começa, define o primeiro pokémon ativo
   useEffect(() => {
@@ -36,6 +34,13 @@ const RaidPage = () => {
       setActivePokemon(team[0]);
     }
   }, [battleStarted, team]);
+
+  const handleStartBattle = () => {
+    if (boss) {
+      startBattle(boss, attackers); // inicia a batalha com boss e time
+      setBattleStarted(true);
+    }
+  };
 
   return (
     <main className="flex flex-col justify-center items-center min-h-screen gap-3 w-full p-5">
@@ -45,8 +50,8 @@ const RaidPage = () => {
         <TeamBox
           attackers={attackers}
           team={team}
-          setTeam={setTeam}
-          onStartBattle={() => setBattleStarted(true)}
+          setTeam={() => {}} // agora o time é controlado pelo contexto
+          onStartBattle={handleStartBattle}
         />
       )}
 
@@ -56,12 +61,24 @@ const RaidPage = () => {
           boss={boss}
           activePokemon={activePokemon}
           setActivePokemon={setActivePokemon}
+          onNextRound={nextRound} // botão para avançar rodada
         />
       )}
 
-      {battleStarted && <LogCombat log={logs.map(
-        l => `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`
-      )} />}
+      {battleStarted && (
+        <LogCombat
+          log={logs.map(
+            (l) =>
+              `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`
+          )}
+        />
+      )}
+
+      {winner && (
+        <p className="text-emphasis mt-4">
+          Fim da batalha! Vencedor: {winner === "player" ? "Jogador" : "Boss"}
+        </p>
+      )}
     </main>
   );
 };

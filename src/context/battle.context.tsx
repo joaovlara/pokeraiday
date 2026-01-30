@@ -3,15 +3,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { BossEntity } from "@/entities/boss.entity";
 import { PokemonEntity } from "@/entities/pokemon.entity";
-import { executeRound, RoundResult } from "@/actions/round";
-
-export interface ActionLog {
-  actor: string;
-  target: string;
-  move: string;
-  damage: number;
-  remainingHP: number;
-}
+import { ActionLog, playerAttack, bossCounterAttack, checkWinner } from "@/actions/round";
 
 interface BattleState {
   boss: BossEntity | null;
@@ -23,7 +15,7 @@ interface BattleState {
 
 interface BattleContextProps extends BattleState {
   startBattle: (boss: BossEntity, team: PokemonEntity[]) => void;
-  nextRound: () => void;
+  performTurn: (pokemon: PokemonEntity, move: any) => void; // jogador escolhe ataque
   resetBattle: () => void;
   setBoss: React.Dispatch<React.SetStateAction<BossEntity | null>>;
   setLogs: React.Dispatch<React.SetStateAction<ActionLog[]>>;
@@ -46,37 +38,28 @@ export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setWinner(null);
   };
 
-  const nextRound = () => {
+  /**
+   * Fluxo de um turno: jogador ataca -> boss responde -> checa vencedor
+   */
+  const performTurn = (pokemon: PokemonEntity, move: any) => {
     if (!boss || winner) return;
 
-    // usa a lógica centralizada em round.ts
-    const result: RoundResult = executeRound(team, boss);
+    // ataque do jogador
+    const { updatedBoss, logs: playerLogs } = playerAttack(pokemon, boss, move);
+    setBoss(updatedBoss);
 
-    // atualiza HPs
-    boss.hp = result.bossHp;
-    team.forEach((p) => {
-      if (result.teamHp[p.name] !== undefined) {
-        p.hp = result.teamHp[p.name];
-      }
-    });
+    // contra-ataque do boss
+    const bossLogs = bossCounterAttack(updatedBoss, team);
 
-    // atualiza logs e rodada
-    setLogs((prev) => [...prev, ...result.log.map((entry) => ({
-      // transforma string em ActionLog simples
-      actor: "", // se quiser enriquecer, pode ajustar executeRound para já retornar ActionLog
-      target: "",
-      move: "",
-      damage: 0,
-      remainingHP: 0,
-    }))]);
+    // atualiza logs
+    setLogs((prev) => [...prev, ...playerLogs, ...bossLogs]);
+
+    // checagem de vitória
+    const result = checkWinner(updatedBoss, team);
+    if (result) setWinner(result);
+
+    // incrementa rodada
     setRound((prev) => prev + 1);
-
-    // checagem de vitória pode ser feita no executeRound também
-    if (result.bossHp <= 0) {
-      setWinner("player");
-    } else if (team.every((p) => p.hp <= 0)) {
-      setWinner("boss");
-    }
   };
 
   const resetBattle = () => {
@@ -96,7 +79,7 @@ export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         logs,
         winner,
         startBattle,
-        nextRound,
+        performTurn,
         resetBattle,
         setBoss,
         setLogs,
