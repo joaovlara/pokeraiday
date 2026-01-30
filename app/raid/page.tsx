@@ -7,28 +7,53 @@ import TeamBattleBox from "./componentes/TeamBattleBox";
 import LogCombat from "./componentes/LogCombat";
 import { PokemonEntity } from "@/entities/pokemon.entity";
 import { useBattle } from "@/context/battle.context";
+import { createAttackers } from "@/actions/battle";
 
 const RaidPage = () => {
-  const { boss, team, logs, startBattle, nextRound, winner } = useBattle(); 
+  const { boss, team, logs, startBattle, winner } = useBattle();
   const [bossMaxHp, setBossMaxHp] = useState<number>(0);
   const [attackers, setAttackers] = useState<PokemonEntity[]>([]);
+  const [loadingAttackers, setLoadingAttackers] = useState<boolean>(false);
+  const [errorAttackers, setErrorAttackers] = useState<string | null>(null);
+
   const [battleStarted, setBattleStarted] = useState(false);
-  const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(null);
+  const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(
+    null,
+  );
 
-  // Sorteia os atacantes apenas uma vez ao carregar a página
+  // Criar atacantes apenas uma vez ao montar a página
   useEffect(() => {
+    let mounted = true;
     const init = async () => {
-      const attackersData = await createAttackers();
-      setAttackers(attackersData);
-
-      if (boss) {
-        setBossMaxHp(boss.hp); // usa o hp inicial do boss global
+      setLoadingAttackers(true);
+      setErrorAttackers(null);
+      try {
+        const attackersData = await createAttackers();
+        if (!mounted) return;
+        setAttackers(attackersData);
+      } catch (err) {
+        console.error("createAttackers error:", err);
+        if (!mounted) return;
+        setErrorAttackers("Falha ao gerar atacantes. Tente novamente.");
+      } finally {
+        if (!mounted) return;
+        setLoadingAttackers(false);
       }
     };
     init();
+    return () => {
+      mounted = false;
+    };
+  }, []); // roda só no mount
+
+  // Atualiza bossMaxHp quando o boss do contexto for definido/alterado
+  useEffect(() => {
+    if (boss) {
+      setBossMaxHp(boss.hp);
+    }
   }, [boss]);
 
-  // Quando a batalha começa, define o primeiro pokémon ativo
+  // Define pokémon ativo quando a batalha começa e o time estiver disponível
   useEffect(() => {
     if (battleStarted && team.length > 0) {
       setActivePokemon(team[0]);
@@ -36,10 +61,11 @@ const RaidPage = () => {
   }, [battleStarted, team]);
 
   const handleStartBattle = () => {
-    if (boss) {
-      startBattle(boss, attackers); // inicia a batalha com boss e time
-      setBattleStarted(true);
-    }
+    if (!boss) return;
+    if (loadingAttackers) return; // evita iniciar antes de pronto
+    if (errorAttackers) return; // opcional: bloquear se houve erro
+    startBattle(boss, attackers);
+    setBattleStarted(true);
   };
 
   return (
@@ -50,8 +76,9 @@ const RaidPage = () => {
         <TeamBox
           attackers={attackers}
           team={team}
-          setTeam={() => {}} // agora o time é controlado pelo contexto
+          setTeam={() => {}}
           onStartBattle={handleStartBattle}
+          // opcional: passe loadingAttackers e errorAttackers para TeamBox para UX
         />
       )}
 
@@ -61,7 +88,6 @@ const RaidPage = () => {
           boss={boss}
           activePokemon={activePokemon}
           setActivePokemon={setActivePokemon}
-          onNextRound={nextRound} // botão para avançar rodada
         />
       )}
 
@@ -69,7 +95,7 @@ const RaidPage = () => {
         <LogCombat
           log={logs.map(
             (l) =>
-              `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`
+              `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`,
           )}
         />
       )}
@@ -78,6 +104,13 @@ const RaidPage = () => {
         <p className="text-emphasis mt-4">
           Fim da batalha! Vencedor: {winner === "player" ? "Jogador" : "Boss"}
         </p>
+      )}
+
+      {!battleStarted && loadingAttackers && (
+        <p className="mt-4 text-muted">Gerando atacantes...</p>
+      )}
+      {!battleStarted && errorAttackers && (
+        <p className="mt-4 text-danger">{errorAttackers}</p>
       )}
     </main>
   );
