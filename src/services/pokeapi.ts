@@ -6,8 +6,3 @@ export async function fetchPokemon(id: number) {
   const data = await res.json();
   return PokemonSchema.parse(data);
 }
-
-export async function fetchRandomPokemon() {
-  const id = randomInt(1, 898); // total de pokémons na POKEAPI
-  return fetchPokemon(id);
-}

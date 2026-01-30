@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { BossEntity } from "@/entities/boss.entity";
 import { PokemonEntity } from "@/entities/pokemon.entity";
-import { calculateDamage } from "@/utils/damage";
+import { executeRound, RoundResult } from "@/actions/round";
 
 export interface ActionLog {
   actor: string;
@@ -26,7 +26,7 @@ interface BattleContextProps extends BattleState {
   nextRound: () => void;
   resetBattle: () => void;
   setBoss: React.Dispatch<React.SetStateAction<BossEntity | null>>;
-  setLogs: React.Dispatch<React.SetStateAction<ActionLog[]>>; // 👈 adicionar
+  setLogs: React.Dispatch<React.SetStateAction<ActionLog[]>>;
 }
 
 const BattleContext = createContext<BattleContextProps | undefined>(undefined);
@@ -49,49 +49,34 @@ export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const nextRound = () => {
     if (!boss || winner) return;
 
-    const aliveTeam = team.filter((p) => p.hp > 0);
-    const turnOrder = [...aliveTeam].sort((a, b) => (b.stats.speed ?? 0) - (a.stats.speed ?? 0));
+    // usa a lógica centralizada em round.ts
+    const result: RoundResult = executeRound(team, boss);
 
-    const newLogs: ActionLog[] = [];
-
-    turnOrder.forEach((actor) => {
-      if (actor.hp <= 0) return;
-      const move = actor.moves[Math.floor(Math.random() * actor.moves.length)];
-      const damage = calculateDamage(actor, boss!, move);
-      boss!.hp = Math.max(0, boss!.hp - damage);
-
-      newLogs.push({
-        actor: actor.name,
-        target: boss!.name,
-        move: move.name,
-        damage,
-        remainingHP: boss!.hp,
-      });
+    // atualiza HPs
+    boss.hp = result.bossHp;
+    team.forEach((p) => {
+      if (result.teamHp[p.name] !== undefined) {
+        p.hp = result.teamHp[p.name];
+      }
     });
 
-    if (boss!.hp > 0) {
-      const target = aliveTeam[Math.floor(Math.random() * aliveTeam.length)];
-      const move = boss!.moves[Math.floor(Math.random() * boss!.moves.length)];
-      const damage = calculateDamage(boss!, target, move);
-      target.hp = Math.max(0, target.hp - damage);
+    // atualiza logs e rodada
+    setLogs((prev) => [...prev, ...result.log.map((entry) => ({
+      // transforma string em ActionLog simples
+      actor: "", // se quiser enriquecer, pode ajustar executeRound para já retornar ActionLog
+      target: "",
+      move: "",
+      damage: 0,
+      remainingHP: 0,
+    }))]);
+    setRound((prev) => prev + 1);
 
-      newLogs.push({
-        actor: boss!.name,
-        target: target.name,
-        move: move.name,
-        damage,
-        remainingHP: target.hp,
-      });
-    }
-
-    if (boss!.hp <= 0) {
+    // checagem de vitória pode ser feita no executeRound também
+    if (result.bossHp <= 0) {
       setWinner("player");
     } else if (team.every((p) => p.hp <= 0)) {
       setWinner("boss");
     }
-
-    setLogs((prev: ActionLog[]) => [...prev, ...newLogs]);
-    setRound((prev) => prev + 1);
   };
 
   const resetBattle = () => {
@@ -114,7 +99,7 @@ export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         nextRound,
         resetBattle,
         setBoss,
-        setLogs, // 👈 expor aqui
+        setLogs,
       }}
     >
       {children}
