@@ -19,11 +19,11 @@ const TeamBattleBox = ({
   activePokemon,
   setActivePokemon,
 }: TeamBattleBoxProps) => {
-  const { performTurn } = useBattle(); // centralizado no contexto
+  const { performTurn } = useBattle();
 
   const handleAttack = (move: any, pokemon: PokemonEntity) => {
     if (!boss || !pokemon) return;
-    performTurn(pokemon, move); // delega ao contexto
+    performTurn(pokemon, move);
   };
 
   return (

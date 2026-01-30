@@ -4,7 +4,8 @@ import { useState } from "react";
 import { PokemonEntity } from "@/entities/pokemon.entity";
 import { BossEntity } from "@/entities/boss.entity";
 import Image from "next/image";
-import { typeMap } from "@/utils/typeMap"; // para ícone e cor do tipo
+import { typeMap } from "@/utils/typeMap";
+import { useBattle } from "@/context/battle.context";
 
 interface PokemonStatsProps {
   pokemon: PokemonEntity;
@@ -14,6 +15,9 @@ interface PokemonStatsProps {
 
 const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
   const [selectedAttack, setSelectedAttack] = useState<number | null>(null);
+  const { hasPokemonAttacked } = useBattle();
+
+  const disabled = hasPokemonAttacked(pokemon.id);
 
   return (
     <section className="flex flex-col w-full gap-5">
@@ -34,6 +38,9 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
             />
           </div>
         </div>
+        {disabled && (
+          <div className="p-2 text-sm text-yellow-300">Este pokémon já atacou.</div>
+        )}
       </div>
 
       {/* Ataques do Pokemon */}
@@ -42,16 +49,18 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
           <div
             key={i}
             onClick={() => {
+              if (disabled) return;
               setSelectedAttack(i);
-              onAttack(atk, pokemon); // dispara ação
+              onAttack(atk, pokemon);
             }}
             className={`flex items-center justify-between border-card bg-neutral-900 p-3 text-white cursor-pointer transition 
-              ${selectedAttack === i ? "border-2 border-neutral-400" : "border"}`}
+              ${selectedAttack === i ? "border-2 border-neutral-400" : "border"}
+              ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            aria-disabled={disabled}
           >
             <div>
               <h3 className="name-pokemon text-sm">{atk.name}</h3>
               <p className="text-sm text-gray-300">Power: {atk.power ?? "-"}</p>
-              {/* <p className="text-sm text-gray-400">PP: {atk.pp ?? "-"}</p> */}
             </div>
             <div className="w-10 h-10 flex items-center justify-center">
               <Image
