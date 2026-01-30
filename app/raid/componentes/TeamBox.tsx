@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { PokemonEntity } from "@/entities/pokemon";
+import { PokemonEntity } from "@/entities/pokemon.entity";
 
 interface TeamBoxProps {
   attackers: PokemonEntity[];

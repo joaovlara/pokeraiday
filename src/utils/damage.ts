@@ -1,5 +1,5 @@
-import { PokemonEntity, Attack } from "@/entities/pokemon";
-import { BossEntity } from "@/entities/boss";
+import { PokemonEntity, Attack } from "@/entities/pokemon.entity";
+import { BossEntity } from "@/entities/boss.entity";
 import { getTypeEffectiveness } from "@/utils/typeChart";
 
 /**

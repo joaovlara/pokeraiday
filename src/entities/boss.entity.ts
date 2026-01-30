@@ -1,6 +1,6 @@
 import { calculateHp, calculateStat } from "@/utils/stats";
 import { PokemonAPI } from "../schemas/pokemon.schema";
-import { Attack } from "./pokemon";
+import { Attack } from "./pokemon.entity";
 import { getRandomMoves } from "@/utils/moves";
 
 export interface BossEntity {

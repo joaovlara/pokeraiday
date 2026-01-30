@@ -2,8 +2,8 @@
 
 import PokemonStats from "./PokemonStats";
 import PokemonMenuLateral from "./PokemonMenuLateral";
-import { PokemonEntity } from "@/entities/pokemon";
-import { BossEntity } from "@/entities/boss";
+import { PokemonEntity } from "@/entities/pokemon.entity";
+import { BossEntity } from "@/entities/boss.entity";
 import { calculateDamage } from "@/utils/damage";
 import { ActionLog, useBattle } from "@/context/battle.context";
 

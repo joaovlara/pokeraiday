@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { BossEntity } from "@/entities/boss";
-import { PokemonEntity } from "@/entities/pokemon";
+import { BossEntity } from "@/entities/boss.entity";
+import { PokemonEntity } from "@/entities/pokemon.entity";
 import { calculateDamage } from "@/utils/damage";
 
 export interface ActionLog {

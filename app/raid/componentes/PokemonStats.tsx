@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { PokemonEntity } from "@/entities/pokemon";
-import { BossEntity } from "@/entities/boss";
+import { PokemonEntity } from "@/entities/pokemon.entity";
+import { BossEntity } from "@/entities/boss.entity";
 import Image from "next/image";
 import { typeMap } from "@/utils/typeMap"; // para ícone e cor do tipo
 

@@ -1,4 +1,4 @@
-import { Attack } from "@/entities/pokemon";
+import { Attack } from "@/entities/pokemon.entity";
 
 export async function fetchMove(name: string): Promise<Attack> {
   const res = await fetch(`https://pokeapi.co/api/v2/move/${name}`);

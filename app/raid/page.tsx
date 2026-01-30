@@ -5,7 +5,7 @@ import BossCard from "./componentes/BossCard";
 import TeamBox from "./componentes/TeamBox";
 import TeamBattleBox from "./componentes/TeamBattleBox";
 import LogCombat from "./componentes/LogCombat";
-import { PokemonEntity } from "@/entities/pokemon";
+import { PokemonEntity } from "@/entities/pokemon.entity";
 import { createAttackers } from "@/actions/team";
 import { useBattle } from "@/context/battle.context";
 

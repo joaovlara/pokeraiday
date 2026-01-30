@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { BossEntity } from "@/entities/boss";
+import { BossEntity } from "@/entities/boss.entity";
 import { typeMap } from "@/utils/typeMap";
 import HealthBar from "./HealthBar";
 

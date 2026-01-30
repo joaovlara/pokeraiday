@@ -1,6 +1,6 @@
 "use client";
 
-import { PokemonEntity } from "@/entities/pokemon";
+import { PokemonEntity } from "@/entities/pokemon.entity";
 import Image from "next/image";
 
 interface PokemonMenuLateralProps {
