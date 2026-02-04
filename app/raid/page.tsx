@@ -70,6 +70,9 @@ const RaidPage = () => {
 
   return (
     <main className="flex flex-col justify-center items-center min-h-screen gap-3 w-full p-5">
+      <div>
+
+
       {boss && <BossCard boss={boss} bossMaxHp={bossMaxHp} />}
 
       {!battleStarted && (
@@ -112,6 +115,8 @@ const RaidPage = () => {
       {!battleStarted && errorAttackers && (
         <p className="mt-4 text-danger">{errorAttackers}</p>
       )}
+      </div>
+
     </main>
   );
 };
