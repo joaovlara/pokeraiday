@@ -24,9 +24,6 @@ const BossBox = () => {
             <TypeBadge key={type} type={type} />
           ))}
         </div>
-        <p>
-          HP: {boss.hp}/{boss.maxHp}
-        </p>
       </div>
     </section>
   );
