@@ -3,7 +3,12 @@
 import React, { createContext, useContext, useState } from "react";
 import { BossEntity } from "@/entities/boss.entity";
 import { PokemonEntity } from "@/entities/pokemon.entity";
-import { ActionLog, playerAttack, bossCounterAttack, checkWinner } from "@/actions/round";
+import {
+  ActionLog,
+  playerAttack,
+  bossCounterAttack,
+  checkWinner,
+} from "@/actions/round";
 
 interface BattleState {
   boss: BossEntity | null;
@@ -28,7 +33,9 @@ interface BattleContextProps extends BattleState {
 
 const BattleContext = createContext<BattleContextProps | undefined>(undefined);
 
-export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [boss, setBoss] = useState<BossEntity | null>(null);
   const [team, setTeam] = useState<PokemonEntity[]>([]);
   const [round, setRound] = useState(0);
@@ -38,7 +45,10 @@ export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // controla quais pokémons já atacaram (por id)
   const [attackedIds, setAttackedIds] = useState<number[]>([]);
 
-  const pickFiveFromAttackers = (attackers: PokemonEntity[], existingTeam: PokemonEntity[] = []): PokemonEntity[] => {
+  const pickFiveFromAttackers = (
+    attackers: PokemonEntity[],
+    existingTeam: PokemonEntity[] = [],
+  ): PokemonEntity[] => {
     if (existingTeam && existingTeam.length === 5) {
       return existingTeam;
     }
@@ -67,9 +77,12 @@ export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // utilitários para attackedIds
-  const hasPokemonAttacked = (pokemonId: number) => attackedIds.includes(pokemonId);
+  const hasPokemonAttacked = (pokemonId: number) =>
+    attackedIds.includes(pokemonId);
   const markPokemonAttacked = (pokemonId: number) => {
-    setAttackedIds((prev) => (prev.includes(pokemonId) ? prev : [...prev, pokemonId]));
+    setAttackedIds((prev) =>
+      prev.includes(pokemonId) ? prev : [...prev, pokemonId],
+    );
   };
 
   /**
@@ -77,31 +90,54 @@ export const BattleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
    * - impede ataque se o pokémon já atacou (hasPokemonAttacked)
    * - marca o pokémon como atacado após executar o ataque
    */
+
   const performTurn = (pokemon: PokemonEntity, move: any) => {
     if (!boss || winner) return;
-
-    // impede ataque repetido
     if (hasPokemonAttacked(pokemon.id)) return;
 
     // ataque do jogador
     const { updatedBoss, logs: playerLogs } = playerAttack(pokemon, boss, move);
     setBoss(updatedBoss);
 
-    // marca pokémon como atacado (persistente durante a batalha)
-    markPokemonAttacked(pokemon.id);
+    // atualiza logs com ataque do jogador
+    setLogs((prev) => [...prev, ...playerLogs]);
 
-    // contra-ataque do boss (usa o team atual)
-    const bossLogs = bossCounterAttack(updatedBoss, team);
+    // checagem de vitória após ataque do jogador
+    let result = checkWinner(updatedBoss, team);
+    if (result) {
+      setWinner(result);
+      return;
+    }
 
-    // atualiza logs
-    setLogs((prev) => [...prev, ...playerLogs, ...bossLogs]);
+    // lista de pokémons vivos
+    const vivos = team.filter((p) => p.hp > 0).map((p) => p.id);
 
-    // checagem de vitória
-    const result = checkWinner(updatedBoss, team);
-    if (result) setWinner(result);
+    // lista de atacantes já registrados + o atual
+    const novosAtacantes = attackedIds.includes(pokemon.id)
+      ? attackedIds
+      : [...attackedIds, pokemon.id];
 
-    // incrementa rodada
-    setRound((prev) => prev + 1);
+    setAttackedIds(novosAtacantes);
+
+    // verifica se todos os vivos já atacaram
+    const todosAtacaram = vivos.every((id) => novosAtacantes.includes(id));
+
+    if (todosAtacaram) {
+      // boss contra-ataca um pokémon aleatório vivo
+      const bossLogs = bossCounterAttack(updatedBoss, team);
+      setLogs((prev) => [...prev, ...bossLogs]);
+
+      // checagem de vitória após ataque do boss
+      result = checkWinner(updatedBoss, team);
+      if (result) {
+        setWinner(result);
+        return;
+      }
+
+      // fim da rodada → incrementa e reseta atacantes
+      setRound((prev) => prev + 1);
+      setAttackedIds([]);
+    }
   };
 
   const resetBattle = () => {

@@ -17,7 +17,9 @@ const RaidPage = () => {
   const [errorAttackers, setErrorAttackers] = useState<string | null>(null);
 
   const [battleStarted, setBattleStarted] = useState(false);
-  const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(null);
+  const [activePokemon, setActivePokemon] = useState<PokemonEntity | null>(
+    null,
+  );
 
   // Criar atacantes apenas uma vez ao montar a página
   useEffect(() => {
@@ -44,9 +46,9 @@ const RaidPage = () => {
     };
   }, []); // roda só no mount
 
-  // Atualiza bossMaxHp quando o boss do contexto for definido/alterado
+  // Atualiza bossMaxHp apenas quando o boss é definido pela primeira vez
   useEffect(() => {
-    if (boss) {
+    if (boss && bossMaxHp === 0) {
       setBossMaxHp(boss.hp);
     }
   }, [boss]);
@@ -93,7 +95,7 @@ const RaidPage = () => {
         <LogCombat
           log={logs.map(
             (l) =>
-              `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`
+              `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`,
           )}
         />
       )}
