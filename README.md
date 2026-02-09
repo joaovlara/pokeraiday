@@ -17,7 +17,6 @@ Este repositório implementa um **mini game inspirado em Raids de Pokémon**. O 
 
 - **Fluxo de batalha**  
   - A batalha é por **turnos**. Em cada round todos os combatentes vivos agem **uma vez**.  
-  - A **ordem de ação** é determinada pelo stat **Speed** em ordem decrescente.  
   - Cada ação é um ataque simples que aplica dano ao alvo. O boss ataca um alvo aleatório vivo da equipe.  
   - O round termina quando todos os combatentes vivos agiram. Em seguida verifica‑se condição de vitória ou derrota.
 
