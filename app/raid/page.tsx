@@ -9,8 +9,10 @@ import { PokemonEntity } from "@/entities/pokemon.entity";
 import { useBattle } from "@/context/battle.context";
 import { createAttackers } from "@/actions/battle";
 import ModalResult from "./componentes/ModalResult";
+import { useRouter } from "next/navigation";
 
 const RaidPage = () => {
+  const router = useRouter();
   const { boss, team, logs, startBattle, winner } = useBattle();
   const [bossMaxHp, setBossMaxHp] = useState<number>(0);
   const [attackers, setAttackers] = useState<PokemonEntity[]>([]);
@@ -22,6 +24,12 @@ const RaidPage = () => {
     null,
   );
 
+  useEffect(() => {
+    if (!boss) {
+      router.push("/");
+    }
+  }, [boss, router]);
+  
   // Criar atacantes apenas uma vez ao montar a página
   useEffect(() => {
     let mounted = true;
@@ -72,46 +80,47 @@ const RaidPage = () => {
   return (
     <main className="flex flex-col justify-center items-center gap-3 w-full p-5">
       <div>
+        {boss && <BossCard boss={boss} bossMaxHp={bossMaxHp} />}
 
+        {!battleStarted && (
+          <TeamBox
+            attackers={attackers}
+            team={team}
+            setTeam={() => {}}
+            onStartBattle={handleStartBattle}
+          />
+        )}
 
-      {boss && <BossCard boss={boss} bossMaxHp={bossMaxHp} />}
+        {battleStarted && boss && (
+          <TeamBattleBox
+            team={team}
+            boss={boss}
+            activePokemon={activePokemon}
+            setActivePokemon={setActivePokemon}
+          />
+        )}
 
-      {!battleStarted && (
-        <TeamBox
-          attackers={attackers}
-          team={team}
-          setTeam={() => {}}
-          onStartBattle={handleStartBattle}
-        />
-      )}
+        {battleStarted && (
+          <LogCombat
+            log={logs.map(
+              (l) =>
+                `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`,
+            )}
+          />
+        )}
 
-      {battleStarted && boss && (
-        <TeamBattleBox
-          team={team}
-          boss={boss}
-          activePokemon={activePokemon}
-          setActivePokemon={setActivePokemon}
-        />
-      )}
-
-      {battleStarted && (
-        <LogCombat
-          log={logs.map(
-            (l) =>
-              `${l.actor} usou ${l.move} em ${l.target} causando ${l.damage} de dano (HP restante: ${l.remainingHP})`,
-          )}
-        />
-      )}
-
-<div> {/* resto da tela */} {winner && ( <ModalResult winner={winner} onClose={() => (null)} /> )} </div>
-      {!battleStarted && loadingAttackers && (
-        <p className="mt-4 text-muted">Gerando atacantes...</p>
-      )}
-      {!battleStarted && errorAttackers && (
-        <p className="mt-4 text-danger">{errorAttackers}</p>
-      )}
+        <div>
+          {" "}
+          {/* resto da tela */}{" "}
+          {winner && <ModalResult winner={winner} onClose={() => null} />}{" "}
+        </div>
+        {!battleStarted && loadingAttackers && (
+          <p className="mt-4 text-muted">Gerando atacantes...</p>
+        )}
+        {!battleStarted && errorAttackers && (
+          <p className="mt-4 text-danger">{errorAttackers}</p>
+        )}
       </div>
-
     </main>
   );
 };
