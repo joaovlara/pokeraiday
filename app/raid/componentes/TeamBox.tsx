@@ -88,7 +88,7 @@ const TeamBox = ({ attackers, team, setTeam, onStartBattle }: TeamBoxProps) => {
                   width={50}
                 />
               )}
-              <span className="name-pokemon capitalize truncate w-full">
+              <span className="name-pokemon truncate w-full">
                 {pokemon.name.replace(/-/g, " ")}
               </span>
               <p>Nível: {pokemon.level}</p>

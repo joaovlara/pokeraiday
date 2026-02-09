@@ -11,10 +11,10 @@ const BossBox = () => {
 
   return (
     <section className="flex flex-col justify-center items-center gap-5 bg-radial-red p-5 rounded-lg">
-      <h2 className="text-emphasis">DESAFIO DO DIA:</h2>
+      <h2 className="text-emphasis text-outline">DESAFIO DO DIA:</h2>
 
       <div className="flex flex-col items-center justify-center gap-1">
-        <h3 className="boss-name uppercase">{boss.name}</h3>
+        <h3 className="boss-name text-outline">{boss.name}</h3>
         <p>Nível: {boss.level}</p>
         {boss.sprite && (
           <Image src={boss.sprite} alt={boss.name} width={200} height={200} />

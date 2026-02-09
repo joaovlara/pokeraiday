@@ -1,23 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Wendy+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Sigmar&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fredoka&display=swap");
 @import "tailwindcss";
 
-@theme {
-  --font-family-base: "roboto", sans-serif;
-  --font-family-primary: "Sigmar", sans-serif;
-  --font-family-secondary: "Wendy One", sans-serif;
-}
-
 @layer components {
+  .text-outline {
+    text-shadow:
+      -2px -2px 0 black,
+      2px -2px 0 black,
+      -2px 2px 0 black,
+      2px 2px 0 black;
+  }
+
   .text-base,
   p {
     @apply font-normal text-neutral-300;
+    font-family: "Fredoka", sans-serif;
   }
 
   .text-emphasis {
-    @apply text-neutral-200 text-2xl font-bold;
+    @apply text-neutral-400 text-xl;
+    font-family: "Sigmar", sans-serif;
   }
 
   .boss-name {
-    @apply text-4xl text-white font-black;
+    @apply text-4xl text-white font-black uppercase;
+    font-family: "Wendy One", sans-serif;
   }
 
   .card {
@@ -27,7 +35,8 @@
     @apply border-stone-700 border-2 rounded-lg p-1;
   }
   .name-pokemon {
-    @apply text-center font-black text-white;
+    @apply text-center capitalize text-white;
+    font-family: "Sigmar", sans-serif;
   }
 
   .btn-primary {
@@ -36,5 +45,4 @@
   .btn-secondary {
     @apply bg-neutral-700 p-4 w-50 rounded-2xl font-bold text-center hover:bg-neutral-600;
   }
-  
 }

@@ -3,6 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { metadata } from "./seo";
+import { Wendy_One } from "next/font/google";
 
 export { metadata };
 

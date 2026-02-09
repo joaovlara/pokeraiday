@@ -14,7 +14,7 @@ const BossCard = ({ boss, bossMaxHp }: BossCardProps) => {
   return (
     <section className="flex flex-col w-full">
       <div className="relative flex flex-col p-4 border-card w-full aspect-square bg-neutral-900 overflow-hidden">
-        <h3 className="boss-name relative z-10 uppercase">{boss.name}</h3>
+        <h3 className="boss-name relative z-10 text-outline">{boss.name}</h3>
         <p className="relative z-10">Nível: {boss.level}</p>
 
         {boss.sprite && (

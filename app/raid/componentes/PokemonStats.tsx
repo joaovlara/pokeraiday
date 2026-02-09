@@ -63,7 +63,7 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
             aria-disabled={disabled}
           >
             <div>
-              <h3 className="name-pokemon text-sm capitalize">
+              <h3 className="name-pokemon text-sm">
                 {atk.name.replace(/-/g, " ")}
               </h3>
               <p className="text-sm text-gray-300">Power: {atk.power ?? "-"}</p>
