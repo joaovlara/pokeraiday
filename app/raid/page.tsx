@@ -69,7 +69,7 @@ const RaidPage = () => {
   };
 
   return (
-    <main className="flex flex-col justify-center items-center min-h-screen gap-3 w-full p-5">
+    <main className="flex flex-col justify-center items-center gap-3 w-full p-5">
       <div>
 
 
@@ -81,7 +81,6 @@ const RaidPage = () => {
           team={team}
           setTeam={() => {}}
           onStartBattle={handleStartBattle}
-          // opcional: passe loadingAttackers e errorAttackers para TeamBox para UX
         />
       )}
 

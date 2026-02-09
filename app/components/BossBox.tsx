@@ -14,7 +14,7 @@ const BossBox = () => {
       <h2 className="text-emphasis">DESAFIO DO DIA:</h2>
 
       <div className="flex flex-col items-center justify-center gap-1">
-        <h3 className="boss-name">{boss.name}</h3>
+        <h3 className="boss-name uppercase">{boss.name}</h3>
         <p>Nível: {boss.level}</p>
         {boss.sprite && (
           <Image src={boss.sprite} alt={boss.name} width={200} height={200} />

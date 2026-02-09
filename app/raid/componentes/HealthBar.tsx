@@ -9,7 +9,7 @@ const HealthBar = ({ current, max }: HealthBarProps) => {
   const percent = Math.max((current / max) * 100, 0);
 
   return (
-    <div className="w-[70%]">
+    <div className="w-[65%]">
       <p className="text-sm mb-1">
         HP: {current}/{max}
       </p>

@@ -60,7 +60,7 @@ const TeamBox = ({ attackers, team, setTeam, onStartBattle }: TeamBoxProps) => {
   return (
     <div className="w-full">
       <div className="p-3">
-        <h2 className="text-emphasis">
+        <h2 className="text-xl font-bold">
           Escolha sua Equipe: {selected.length}/5
         </h2>
       </div>
@@ -73,7 +73,7 @@ const TeamBox = ({ attackers, team, setTeam, onStartBattle }: TeamBoxProps) => {
             <div
               key={pokemon.id}
               onClick={() => toggleSelect(pokemon)}
-              className={`flex flex-col items-center justify-center bg-neutral-900 border-2 aspect-square rounded-lg p-4 cursor-pointer transition-colors ${
+              className={`flex flex-col items-center justify-center bg-neutral-900 border-2 aspect-square rounded-lg p-2 cursor-pointer transition-colors ${
                 isSelected
                   ? "border-green-500 bg-neutral-950"
                   : "border-stone-700"

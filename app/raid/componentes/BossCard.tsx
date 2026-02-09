@@ -13,8 +13,8 @@ interface BossCardProps {
 const BossCard = ({ boss, bossMaxHp }: BossCardProps) => {
   return (
     <section className="flex flex-col w-full">
-      <div className="relative flex flex-col p-5 border-card w-full aspect-square bg-neutral-900 overflow-hidden">
-        <h3 className="boss-name relative z-10">{boss.name}</h3>
+      <div className="relative flex flex-col p-4 border-card w-full aspect-square bg-neutral-900 overflow-hidden">
+        <h3 className="boss-name relative z-10 uppercase">{boss.name}</h3>
         <p className="relative z-10">Nível: {boss.level}</p>
 
         {boss.sprite && (
@@ -27,7 +27,7 @@ const BossCard = ({ boss, bossMaxHp }: BossCardProps) => {
         )}
 
         {/* Barra de vida */}
-        <div className="absolute bottom-3 left-3 right-3 z-10">
+        <div className="absolute bottom-6 left-3 right-3 z-10">
           <HealthBar current={boss.hp} max={bossMaxHp} />
         </div>
 
