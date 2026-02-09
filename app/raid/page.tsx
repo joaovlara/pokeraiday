@@ -8,6 +8,7 @@ import LogCombat from "./componentes/LogCombat";
 import { PokemonEntity } from "@/entities/pokemon.entity";
 import { useBattle } from "@/context/battle.context";
 import { createAttackers } from "@/actions/battle";
+import ModalResult from "./componentes/ModalResult";
 
 const RaidPage = () => {
   const { boss, team, logs, startBattle, winner } = useBattle();
@@ -102,12 +103,7 @@ const RaidPage = () => {
         />
       )}
 
-      {winner && (
-        <p className="text-emphasis mt-4">
-          Fim da batalha! Vencedor: {winner === "player" ? "Jogador" : "Boss"}
-        </p>
-      )}
-
+<div> {/* resto da tela */} {winner && ( <ModalResult winner={winner} onClose={() => (null)} /> )} </div>
       {!battleStarted && loadingAttackers && (
         <p className="mt-4 text-muted">Gerando atacantes...</p>
       )}

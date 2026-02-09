@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type ModalResultProps = {
   winner: "player" | "boss";
@@ -10,7 +13,7 @@ const ModalResult: React.FC<ModalResultProps> = ({ winner, onClose }) => {
   const router = useRouter();
 
   const handleClose = () => {
-    onClose(); // mantém a lógica que você já tem
+    onClose();
     router.push("/"); // redireciona para a página inicial
   };
 
@@ -20,15 +23,24 @@ const ModalResult: React.FC<ModalResultProps> = ({ winner, onClose }) => {
         <h2 className="text-2xl font-bold mb-6 text-white">
           {winner === "player" ? "Vitória!" : "Derrota!"}
         </h2>
-        <a href="/" className="btn-secondary mt-6 w-full cursor-pointer">
-          Conheça o projeto
-        </a>
-        <button
-          className="btn-secondary mt-6 w-full cursor-pointer"
-          onClick={handleClose}
-        >
-          Fechar
-        </button>
+
+        <div className="w-full">
+          <a
+            className="btn-secondary mt-6 w-full cursor-pointer"
+            href="https://github.com/joaovlara/pokeraiday"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Conheça o projeto
+          </a>
+
+          <button
+            className="btn-secondary mt-6 w-full cursor-pointer"
+            onClick={handleClose}
+          >
+            Fechar
+          </button>
+        </div>
       </div>
     </section>
   );
