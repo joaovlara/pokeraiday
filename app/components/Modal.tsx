@@ -8,7 +8,7 @@ interface ModalProps {
 
 const Modal = ({ title, children, onClose }: ModalProps) => {
   return (
-    <section className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+    <section className="fixed inset-0 flex items-center p-3 justify-center bg-black/70 z-50">
       <div className="relative bg-neutral-800 p-8 rounded-lg shadow-lg max-w-lg w-full">
         <h2 className="text-2xl font-bold mb-6 text-white">{title}</h2>
         <div className="text-lg text-gray-200">{children}</div>

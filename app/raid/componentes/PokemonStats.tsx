@@ -23,8 +23,10 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
     <section className="flex flex-col w-full gap-5">
       {/* Infos do Pokemon */}
       <div className="border-card bg-neutral-900">
-        <div className="flex justify-between p-3">
-          <h3 className="name-pokemon capitalize">{pokemon.name}</h3>
+        <div className="flex justify-between p-2">
+          <h3 className="name-pokemon capitalize">
+            {pokemon.name.replace(/-/g, " ")}
+          </h3>
           <p>Nível: {pokemon.level}</p>
         </div>
         <div className="flex justify-between p-3">
@@ -39,7 +41,9 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
           </div>
         </div>
         {disabled && (
-          <div className="p-2 text-sm text-yellow-300">Este pokémon já atacou.</div>
+          <div className="p-2 text-sm text-yellow-300">
+            Este pokémon já atacou.
+          </div>
         )}
       </div>
 
@@ -59,10 +63,12 @@ const PokemonStats = ({ pokemon, boss, onAttack }: PokemonStatsProps) => {
             aria-disabled={disabled}
           >
             <div>
-              <h3 className="name-pokemon text-sm">{atk.name}</h3>
+              <h3 className="name-pokemon text-sm capitalize">
+                {atk.name.replace(/-/g, " ")}
+              </h3>
               <p className="text-sm text-gray-300">Power: {atk.power ?? "-"}</p>
             </div>
-            <div className="w-10 h-10 flex items-center justify-center">
+            <div className="aspect-square flex items-center justify-center">
               <Image
                 src={typeMap[atk.type].icon}
                 alt={`Tipo ${atk.type}`}

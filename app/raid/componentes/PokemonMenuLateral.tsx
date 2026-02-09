@@ -24,7 +24,7 @@ export default function PokemonMenuLateral({
   const { hasPokemonAttacked } = useBattle();
 
   return (
-    <aside className="w-40 flex flex-col items-center space-y-4">
+    <aside className="w-20 flex flex-col items-center space-y-4">
       {team.map((pkm) => {
         const isSelected = activePokemon?.id === pkm.id;
         const alive = (pkm.hp ?? 0) > 0;

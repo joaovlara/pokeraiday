@@ -27,7 +27,7 @@
     @apply border-stone-700 border-2 rounded-lg p-1;
   }
   .name-pokemon {
-    @apply text-2xl font-black text-white;
+    @apply text-center font-black text-white;
   }
 
   .btn-primary {

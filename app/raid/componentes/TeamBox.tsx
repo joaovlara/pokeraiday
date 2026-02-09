@@ -88,7 +88,9 @@ const TeamBox = ({ attackers, team, setTeam, onStartBattle }: TeamBoxProps) => {
                   width={50}
                 />
               )}
-              <span className="name-pokemon capitalize">{pokemon.name}</span>
+              <span className="name-pokemon capitalize truncate w-full">
+                {pokemon.name.replace(/-/g, " ")}
+              </span>
               <p>Nível: {pokemon.level}</p>
             </div>
           );
@@ -96,8 +98,9 @@ const TeamBox = ({ attackers, team, setTeam, onStartBattle }: TeamBoxProps) => {
 
         {/* Botão de iniciar batalha */}
         <button
-          disabled={selected.length !== 5} onClick={handleStart}
-          className="flex items-center justify-center bg-red-900 hover:bg-red-700 disabled:bg-gray-700 text-white font-bold text-3xl text-wrap rounded-lg p-2 text-center"
+          disabled={selected.length !== 5}
+          onClick={handleStart}
+          className="flex items-center justify-center bg-red-900 hover:bg-red-700 disabled:bg-gray-700 text-white font-bold text-2xl text-wrap rounded-lg p-2 text-center"
         >
           Iniciar Batalha
         </button>

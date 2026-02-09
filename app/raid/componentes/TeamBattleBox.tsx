@@ -27,7 +27,7 @@ const TeamBattleBox = ({
   };
 
   return (
-    <section className="flex flex-row w-full">
+    <section className="flex flex-row w-full pt-3">
       {activePokemon && (
         <PokemonStats
           pokemon={activePokemon}
